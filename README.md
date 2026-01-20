@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Design System
 
-## Getting Started
+Sistema de Design criado com React, TypeScript, Tailwind CSS e Shadcn/UI.
 
-First, run the development server:
+## Stack Tecnológica
+
+- **Framework:** Next.js 16 (App Router)
+- **Linguagem:** TypeScript
+- **Estilização:** Tailwind CSS v4
+- **Componentes:** Shadcn/UI
+- **MCPs configurados:**
+  - Shadcn MCP (interação com componentes)
+  - Figma MCP (integração com designs)
+
+## Estrutura do Projeto
+
+```
+design-system/
+├── app/                 # App Router do Next.js
+│   ├── layout.tsx      # Layout principal
+│   ├── page.tsx        # Página inicial
+│   └── globals.css     # Estilos globais + variáveis CSS
+├── components/         # Componentes do Design System
+│   └── ui/            # Componentes Shadcn/UI
+├── lib/               # Utilitários
+│   └── utils.ts       # Funções auxiliares (cn, etc)
+├── components.json    # Configuração do Shadcn/UI
+└── mcp-config.json    # Configuração dos MCPs
+```
+
+## Começando
+
+### Desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+### Lint
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Adicionar Componentes Shadcn/UI
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para adicionar componentes do Shadcn:
 
-## Deploy on Vercel
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
+npx shadcn@latest add input
+# etc...
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ou use o MCP do Shadcn através do Claude para adicionar componentes automaticamente.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Configuração dos MCPs
+
+Consulte [MCP-SETUP.md](./MCP-SETUP.md) para instruções detalhadas sobre como configurar os MCPs do Shadcn e Figma.
+
+## Próximos Passos
+
+1. Configure os MCPs seguindo [MCP-SETUP.md](./MCP-SETUP.md)
+2. Obtenha seu token do Figma (se necessário)
+3. Comece a adicionar componentes ao Design System
+4. Crie a documentação dos componentes
+5. Configure Storybook (opcional)
+
+## Recursos
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Shadcn/UI](https://ui.shadcn.com)
+- [TypeScript](https://www.typescriptlang.org)
