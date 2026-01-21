@@ -5,18 +5,21 @@ import {
   IconArrowDown,
   IconArrowRight,
   IconArrowUp,
-  IconCalendar,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
   IconCreditCard,
   IconPlus,
   IconSearch,
-  IconSettings2,
 } from "@tabler/icons-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import { FinanceSidebar } from "@/components/finance-sidebar"
+import { DashboardHeader } from "@/components/finance/dashboard-header"
+import { BalanceCard } from "@/components/finance/balance-card"
+import { IncomeCard } from "@/components/finance/income-card"
+import { ExpenseCard } from "@/components/finance/expense-card"
+import { ExpensesByCategoryCarousel } from "@/components/finance/expenses-by-category-carousel"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -36,11 +39,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import {
   Table,
@@ -71,11 +72,42 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
+/**
+ * Gera dados de fluxo financeiro agrupados por mês
+ * 
+ * TODO: No futuro, esta função deve receber transações reais do contexto financeiro
+ * e agrupá-las por mês, calculando receitas e despesas.
+ * 
+ * @returns Array com dados de fluxo financeiro por mês
+ */
+function generateCashFlowData() {
+  // Dados mock para 12 meses (JAN até DEZ)
+  // TODO: Substituir por lógica que agrupa transações reais por mês
+  // const transactions = getFilteredTransactions()
+  // const groupedByMonth = groupTransactionsByMonth(transactions)
+  // return calculateMonthlyCashFlow(groupedByMonth)
+  
+  const monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"]
+  
+  return monthNames.map((month, index) => ({
+    month,
+    income: 10000 + Math.random() * 6000, // Mock: receitas entre 10k e 16k
+    expenses: 6000 + Math.random() * 5000, // Mock: despesas entre 6k e 11k
+  })).map((item) => ({
+    ...item,
+    income: Math.round(item.income),
+    expenses: Math.round(item.expenses),
+  }))
+}
+
 export default function Home() {
   const [chartFilter, setChartFilter] = React.useState<"all" | "income" | "expenses">("all")
   const [transactionFilter, setTransactionFilter] = React.useState<"expenses" | "income" | "all">("expenses")
   const [currentPage, setCurrentPage] = React.useState(1)
   const itemsPerPage = 5
+
+  // Gera dados de fluxo financeiro (mock por enquanto, futuro: do contexto)
+  const cashFlowData = React.useMemo(() => generateCashFlowData(), [])
 
   const filteredTransactions = financeData.transactions.filter((t) => {
     if (transactionFilter === "all") return true
@@ -100,140 +132,28 @@ export default function Home() {
     >
       <FinanceSidebar variant="inset" />
       <SidebarInset>
-        <div className="flex flex-1 flex-col bg-muted/30">
+        <div className="flex flex-1 flex-col bg-muted/0">
           {/* Header */}
-          <header className="sticky top-0 z-10 flex h-16 items-center gap-2 border-b bg-background px-4 lg:px-6">
-            {/* Sidebar Trigger */}
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mx-2 data-[orientation=vertical]:h-4"
-            />
-
-            <div className="flex flex-1 items-center gap-3">
-              {/* Search */}
-              <div className="relative">
-                <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Pesquisar"
-                  className="w-40 pl-9 md:w-48"
-                />
-              </div>
-
-              {/* Settings Filter */}
-              <Button variant="outline" size="icon">
-                <IconSettings2 className="size-4" />
-              </Button>
-
-              {/* Date Range */}
-              <Button variant="outline" className="gap-2">
-                <IconCalendar className="size-4" />
-                <span className="hidden sm:inline">01 Jan - 31 Jan 2026</span>
-              </Button>
-
-              {/* User Avatars */}
-              <div className="flex -space-x-2">
-                <Avatar className="size-9 border-2 border-background">
-                  <AvatarFallback>CS</AvatarFallback>
-                </Avatar>
-                <Avatar className="size-9 border-2 border-background">
-                  <AvatarFallback>JD</AvatarFallback>
-                </Avatar>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 rounded-full"
-                >
-                  <IconPlus className="size-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* New Transaction Button */}
-            <Button className="gap-2">
-              <IconPlus className="size-4" />
-              <span className="hidden sm:inline">Nova transação</span>
-            </Button>
-          </header>
+          <DashboardHeader />
 
           {/* Main Content */}
-          <div className="flex flex-1 flex-col gap-6 p-4 lg:p-6">
+          <div 
+            className="flex flex-1 flex-col gap-6 p-4 lg:p-6"
+            style={{ backgroundColor: "oklab(0.290478 0.0000131577 0.00000579655 / 0.0)" }}
+          >
             {/* Top Section: Cards Grid */}
             <div className="grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_380px]">
               {/* Left Column */}
               <div className="flex flex-col gap-6">
+                {/* Summary Cards - Balance, Income, Expenses */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <BalanceCard />
+                  <IncomeCard />
+                  <ExpenseCard />
+                </div>
+
                 {/* Expense Category Cards */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  {financeData.expenseCategories.map((category) => (
-                    <Card key={category.id} className="py-4">
-                      <CardContent className="p-4 pt-0">
-                        <div className="mb-3 text-2xl font-bold">{category.percentage}%</div>
-                        <div
-                          className="mb-3 h-1.5 rounded-full"
-                          style={{
-                            background: `linear-gradient(to right, ${category.color} ${category.percentage}%, hsl(var(--muted)) ${category.percentage}%)`,
-                          }}
-                        />
-                        <div className="text-sm text-muted-foreground">{category.name}</div>
-                        <div className="text-lg font-semibold">{formatCurrency(category.value)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Vence dia {category.dueDay}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {/* Summary Cards */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  {/* Saldo Total */}
-                  <Card className="py-4">
-                    <CardContent className="flex items-start gap-3 p-4 pt-0">
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                        <span className="text-lg font-semibold">$</span>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Saldo Total</div>
-                        <div className="text-2xl font-bold">{formatCurrency(financeData.summary.totalBalance)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Vence dia {financeData.summary.dueDay}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Receitas */}
-                  <Card className="py-4">
-                    <CardContent className="flex items-start gap-3 p-4 pt-0">
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                        <IconArrowDown className="size-5 text-green-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Receitas</div>
-                        <div className="text-2xl font-bold">{formatCurrency(financeData.summary.income)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Vence dia {financeData.summary.dueDay}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Despesas */}
-                  <Card className="py-4">
-                    <CardContent className="flex items-start gap-3 p-4 pt-0">
-                      <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                        <IconArrowUp className="size-5 text-red-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Despesas</div>
-                        <div className="text-2xl font-bold">{formatCurrency(financeData.summary.expenses)}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Vence dia {financeData.summary.dueDay}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                <ExpensesByCategoryCarousel />
               </div>
 
               {/* Right Column - Cards/Accounts */}
@@ -285,8 +205,8 @@ export default function Home() {
             {/* Middle Section: Chart + Upcoming Expenses */}
             <div className="grid gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_380px]">
               {/* Cash Flow Chart */}
-              <Card className="py-4">
-                <CardHeader className="flex-row items-center justify-between pb-4">
+              <Card className="py-4 flex flex-col">
+                <CardHeader className="flex flex-row items-center justify-between pb-4 w-full">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <svg
                       className="size-5"
@@ -300,22 +220,8 @@ export default function Home() {
                     </svg>
                     Fluxo financeiro
                   </CardTitle>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="flex items-center gap-1">
-                        <span className="size-2 rounded-full bg-[hsl(var(--chart-3))]" />
-                        Receitas
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="size-2 rounded-full bg-[hsl(var(--chart-3))]/50" />
-                        Despesas
-                      </span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-4">
-                  {/* Filter Buttons */}
-                  <div className="mb-4">
+                  {/* Filter Buttons - Canto superior direito, inline */}
+                  <div className="flex items-center">
                     <ButtonGroup>
                       <Button
                         variant={chartFilter === "all" ? "default" : "outline"}
@@ -340,10 +246,11 @@ export default function Home() {
                       </Button>
                     </ButtonGroup>
                   </div>
-
+                </CardHeader>
+                <CardContent className="px-4 mt-auto">
                   {/* Chart */}
-                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                    <BarChart data={financeData.cashFlow} barGap={2}>
+                  <ChartContainer config={chartConfig} className="h-[230px] w-full">
+                    <BarChart data={cashFlowData} barGap={2}>
                       <CartesianGrid vertical={false} strokeDasharray="3 3" />
                       <XAxis
                         dataKey="month"
@@ -380,6 +287,20 @@ export default function Home() {
                       )}
                     </BarChart>
                   </ChartContainer>
+                  
+                  {/* Legend - Parte inferior centralizada */}
+                  <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="flex items-center gap-1">
+                        <span className="size-2 rounded-full bg-[hsl(var(--chart-3))]" />
+                        Receitas
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="size-2 rounded-full bg-[hsl(var(--chart-3))]/50" />
+                        Despesas
+                      </span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 

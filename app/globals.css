@@ -32,6 +32,10 @@
   --accent: 192 54% 66%;
   --accent-foreground: 0 0% 9%;
 
+  /* === FINANCE COLORS (Light Mode) === */
+  --finance-income: 192 48% 47%; /* light-blue-600 for contrast on light bg */
+  --finance-expense: 23 56% 44%; /* orange-600 for contrast on light bg */
+
   /* === DESTRUCTIVE === */
   --destructive: 4 69% 60%;
   --destructive-foreground: 0 0% 100%;
@@ -172,6 +176,10 @@
   --accent: 0 0% 17%;
   --accent-foreground: 0 0% 98%;
 
+  /* === FINANCE COLORS (Dark Mode) === */
+  --finance-income: 192 58% 75%; /* light-blue-300 for contrast on dark bg */
+  --finance-expense: 23 65% 70%; /* orange-300 for contrast on dark bg */
+
   /* === DESTRUCTIVE === */
   --destructive: 4 69% 60%;
   --destructive-foreground: 0 0% 100%;
@@ -276,6 +284,8 @@
   --color-orange-700: hsl(var(--orange-700));
   --color-orange-800: hsl(var(--orange-800));
   --color-orange-900: hsl(var(--orange-900));
+  --color-finance-income: hsl(var(--finance-income));
+  --color-finance-expense: hsl(var(--finance-expense));
   --color-red-50: hsl(var(--red-50));
   --color-red-100: hsl(var(--red-100));
   --color-red-200: hsl(var(--red-200));
