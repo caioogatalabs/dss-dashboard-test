@@ -1,0 +1,12 @@
+---
+name: dash-shadcn-rules
+description: This is a new rule
+---
+
+# Overview
+
+Follow core concepts from TailwindCSS
+https://tailwindcss.com/docs/styling-with-utility-classes
+
+
+Use docs and indexed links only for business rules, not for style and componente building rules. Any conflict, ask the user. 

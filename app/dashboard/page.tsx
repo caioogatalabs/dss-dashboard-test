@@ -71,7 +71,7 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
-export default function Home() {
+export default function DashboardPage() {
   const [chartFilter, setChartFilter] = React.useState<"all" | "income" | "expenses">("all")
   const [transactionFilter, setTransactionFilter] = React.useState<"expenses" | "income" | "all">("expenses")
   const [currentPage, setCurrentPage] = React.useState(1)
