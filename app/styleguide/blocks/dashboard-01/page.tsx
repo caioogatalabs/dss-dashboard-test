@@ -40,10 +40,10 @@ export default function Dashboard01Page() {
                 <li>Data table with sorting, filtering, and pagination</li>
               </ul>
               <div className="mt-4">
-                <Link href="/dashboard" target="_blank">
+                <Link href="/" target="_blank">
                   <Button>
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Open Dashboard
+                    Open Dashboard Preview
                   </Button>
                 </Link>
               </div>
@@ -114,9 +114,8 @@ export default function Dashboard01Page() {
           <CardContent className="p-6">
             <pre className="text-sm overflow-x-auto">
 {`app/
-└── dashboard/
-    ├── page.tsx          # Main dashboard page
-    └── data.json         # Sample data for table
+├── page.tsx              # Main dashboard page (root)
+└── finance-data.json     # Sample data for dashboard
 
 components/
 ├── ui/

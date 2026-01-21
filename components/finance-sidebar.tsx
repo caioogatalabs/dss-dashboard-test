@@ -40,7 +40,7 @@ import {
 const navItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/",
     icon: IconCreditCard,
     isActive: true,
   },
@@ -202,7 +202,7 @@ export function FinanceSidebar({ ...props }: React.ComponentProps<typeof Sidebar
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/dashboard">
+              <a href="/">
                 <svg
                   viewBox="0 0 24 24"
                   fill="currentColor"
