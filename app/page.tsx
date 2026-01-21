@@ -134,12 +134,10 @@ export default function Home() {
               {/* User Avatars */}
               <div className="flex -space-x-2">
                 <Avatar className="size-9 border-2 border-background">
-                  <AvatarImage src="/avatars/01.png" />
-                  <AvatarFallback>U1</AvatarFallback>
+                  <AvatarFallback>CS</AvatarFallback>
                 </Avatar>
                 <Avatar className="size-9 border-2 border-background">
-                  <AvatarImage src="/avatars/02.png" />
-                  <AvatarFallback>U2</AvatarFallback>
+                  <AvatarFallback>JD</AvatarFallback>
                 </Avatar>
                 <Button
                   variant="outline"

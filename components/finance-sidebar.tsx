@@ -61,7 +61,7 @@ const navItems = [
 const userData = {
   name: "Caio Silva",
   email: "caio@exemplo.com",
-  avatar: "/avatars/01.png",
+  avatar: "",
 }
 
 function NavUser({
