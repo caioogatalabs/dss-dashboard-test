@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
   IconCreditCard,
@@ -38,24 +40,11 @@ import {
 } from "@/components/ui/sidebar"
 
 const navItems = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: IconCreditCard,
-    isActive: true,
-  },
-  {
-    title: "Categorias",
-    url: "#",
-    icon: IconLayoutGrid,
-    isActive: false,
-  },
-  {
-    title: "Transações",
-    url: "#",
-    icon: IconReceipt,
-    isActive: false,
-  },
+  { title: "Dashboard", url: "/", icon: IconCreditCard },
+  { title: "Cartões", url: "/cartoes", icon: IconCreditCard },
+  { title: "Transações", url: "/transacoes", icon: IconReceipt },
+  { title: "Categorias", url: "#", icon: IconLayoutGrid },
+  { title: "Perfil", url: "/perfil", icon: IconUserCircle },
 ]
 
 const userData = {
@@ -123,15 +112,19 @@ function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Minha Conta
+              <DropdownMenuItem asChild>
+                <Link href="/perfil">
+                  <IconUserCircle />
+                  Minha Conta
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Sair
+            <DropdownMenuItem asChild>
+              <Link href="/">
+                <IconLogout />
+                Sair
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -193,6 +186,8 @@ function NavSettings() {
 }
 
 export function FinanceSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -202,7 +197,7 @@ export function FinanceSidebar({ ...props }: React.ComponentProps<typeof Sidebar
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/">
+              <Link href="/">
                 <svg
                   viewBox="0 0 24 24"
                   fill="currentColor"
@@ -213,7 +208,7 @@ export function FinanceSidebar({ ...props }: React.ComponentProps<typeof Sidebar
                   <rect x="2" y="14" width="20" height="8" rx="1" />
                 </svg>
                 <span className="text-base font-semibold">Finanças</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -222,20 +217,23 @@ export function FinanceSidebar({ ...props }: React.ComponentProps<typeof Sidebar
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={item.isActive}
-                  >
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navItems.map((item) => {
+                const isActive = item.url !== "#" && pathname === item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.title}
+                      isActive={isActive}
+                    >
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

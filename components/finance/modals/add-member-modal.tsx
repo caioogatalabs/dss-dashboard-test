@@ -172,7 +172,7 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="h-full w-full sm:max-w-[500px]">
+      <DrawerContent className="h-dvh w-full max-sm:max-w-none sm:w-[600px] sm:max-w-[600px]">
         {/* Header */}
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
@@ -192,7 +192,7 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="mx-auto max-w-full space-y-4">
+          <div className="mx-auto max-w-full space-y-[1.2rem]">
             {/* Nome Completo */}
             <Field label="Nome Completo" required error={errors.name}>
               <Input
@@ -227,7 +227,7 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
             {/* Avatar */}
             <Field label="Avatar">
               <Tabs value={avatarTab} onValueChange={(v) => setAvatarTab(v as "url" | "upload")}>
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList>
                   <TabsTrigger value="url">URL</TabsTrigger>
                   <TabsTrigger value="upload">Upload</TabsTrigger>
                 </TabsList>

@@ -1,7 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { IconArrowDownLeft, IconArrowUpRight, IconSearch, IconUser } from "@tabler/icons-react"
+import {
+  IconArrowDown,
+  IconArrowDownLeft,
+  IconArrowUp,
+  IconArrowUpRight,
+  IconSearch,
+  IconUser,
+} from "@tabler/icons-react"
 import { useFinance } from "@/hooks/use-finance"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -79,13 +86,34 @@ function formatInstallments(installments?: { current: number; total: number }): 
   return `${installments.total}x`
 }
 
+type SortKey = "date" | "amount" | "description"
+type SortOrder = "asc" | "desc"
+
+interface TransactionsTableProps {
+  /** Quando informado, usa esta lista em vez de getFilteredTransactions */
+  transactions?: Transaction[]
+  /** Linhas por página na paginação "ver mais" */
+  linesPerPage?: number
+  /** Oculta filtros de busca e tipo (uso em modo expandido) */
+  hideFilters?: boolean
+  /** Habilita ordenação pelos headers Data, Valor, Descrição */
+  sortable?: boolean
+  className?: string
+}
+
 /**
  * Componente de Tabela de Transações Detalhada
- * 
+ *
  * Exibe transações com filtros globais e locais, ordenação por data,
  * paginação de "ver mais" e formatação completa das colunas.
  */
-export function TransactionsTable() {
+export function TransactionsTable({
+  transactions: propTransactions,
+  linesPerPage = 5,
+  hideFilters = false,
+  sortable = false,
+  className,
+}: TransactionsTableProps = {}) {
   const {
     getFilteredTransactions,
     categories,
@@ -94,107 +122,141 @@ export function TransactionsTable() {
     creditCards,
   } = useFinance()
 
-  // Estados locais da tabela
   const [searchText, setSearchText] = React.useState("")
   const [typeFilter, setTypeFilter] = React.useState<"all" | "income" | "expense">("all")
-  const [visibleCount, setVisibleCount] = React.useState(5)
+  const [visibleCount, setVisibleCount] = React.useState(linesPerPage)
+  const [sortKey, setSortKey] = React.useState<SortKey>("date")
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>("desc")
 
-  // Busca transações filtradas do contexto (aplica filtros globais)
-  const globalFilteredTransactions = React.useMemo(
-    () => getFilteredTransactions(),
-    [getFilteredTransactions]
+  const baseTransactions = React.useMemo(
+    () => (propTransactions ?? getFilteredTransactions()),
+    [propTransactions, getFilteredTransactions]
   )
 
-  // Aplica filtros locais (busca textual e tipo)
   const localFilteredTransactions = React.useMemo(() => {
-    let filtered = globalFilteredTransactions
-
-    // Filtro por tipo
-    if (typeFilter !== "all") {
-      filtered = filtered.filter((tx) => tx.type === typeFilter)
-    }
-
-    // Filtro por busca textual (descrição OU categoria)
+    let filtered = baseTransactions
+    if (hideFilters) return filtered
+    if (typeFilter !== "all") filtered = filtered.filter((tx) => tx.type === typeFilter)
     if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase().trim()
+      const q = searchText.toLowerCase().trim()
       filtered = filtered.filter((tx) => {
-        const descriptionMatch = tx.description.toLowerCase().includes(searchLower)
-        const category = categories.find((c) => c.id === tx.categoryId)
-        const categoryMatch = category?.name.toLowerCase().includes(searchLower) ?? false
-        return descriptionMatch || categoryMatch
+        const matchDesc = tx.description.toLowerCase().includes(q)
+        const cat = categories.find((c) => c.id === tx.categoryId)
+        return matchDesc || (cat?.name.toLowerCase().includes(q) ?? false)
       })
     }
-
     return filtered
-  }, [globalFilteredTransactions, typeFilter, searchText, categories])
+  }, [baseTransactions, hideFilters, typeFilter, searchText, categories])
 
-  // Ordena por data decrescente (mais recente primeiro)
   const sortedTransactions = React.useMemo(() => {
-    return [...localFilteredTransactions].sort((a, b) => {
-      return b.date.getTime() - a.date.getTime()
+    const arr = [...localFilteredTransactions]
+    arr.sort((a, b) => {
+      let cmp = 0
+      if (sortKey === "date") {
+        cmp = a.date.getTime() - b.date.getTime()
+      } else if (sortKey === "amount") {
+        cmp = a.amount - b.amount
+      } else {
+        cmp = a.description.localeCompare(b.description)
+      }
+      return sortOrder === "asc" ? cmp : -cmp
     })
-  }, [localFilteredTransactions])
+    return arr
+  }, [localFilteredTransactions, sortKey, sortOrder])
 
-  // Transações visíveis (paginação de "ver mais")
-  const visibleTransactions = React.useMemo(() => {
-    return sortedTransactions.slice(0, visibleCount)
-  }, [sortedTransactions, visibleCount])
+  const visibleTransactions = React.useMemo(
+    () => sortedTransactions.slice(0, visibleCount),
+    [sortedTransactions, visibleCount]
+  )
 
-  // Reset para início quando filtros mudam
   React.useEffect(() => {
-    setVisibleCount(5)
-  }, [searchText, typeFilter, globalFilteredTransactions.length])
+    setVisibleCount(linesPerPage)
+  }, [linesPerPage, searchText, typeFilter, baseTransactions.length])
 
-  /**
-   * Carrega mais 5 transações
-   */
   const handleLoadMore = React.useCallback(() => {
-    setVisibleCount((prev) => Math.min(prev + 5, sortedTransactions.length))
-  }, [sortedTransactions.length])
+    setVisibleCount((prev) => Math.min(prev + linesPerPage, sortedTransactions.length))
+  }, [linesPerPage, sortedTransactions.length])
+
+  const toggleSort = (key: SortKey) => {
+    if (!sortable) return
+    if (sortKey === key) {
+      setSortOrder((o) => (o === "asc" ? "desc" : "asc"))
+    } else {
+      setSortKey(key)
+      setSortOrder(key === "date" || key === "amount" ? "desc" : "asc")
+    }
+  }
+
+  const SortIcon = ({ column }: { column: SortKey }) => {
+    if (!sortable || sortKey !== column) return null
+    return sortOrder === "asc" ? (
+      <IconArrowUp className="ml-1 inline size-3.5" />
+    ) : (
+      <IconArrowDown className="ml-1 inline size-3.5" />
+    )
+  }
 
   const hasMore = visibleCount < sortedTransactions.length
   const totalCount = sortedTransactions.length
 
   return (
-    <div className="space-y-4">
-      {/* Filtros */}
-      <div className="flex items-center gap-2">
-        <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar lançamentos"
-            className="max-w-sm pl-9"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+    <div className={className ?? "space-y-4"}>
+      {!hideFilters && (
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar lançamentos"
+              className="max-w-sm pl-9"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
+          <Select
+            value={typeFilter}
+            onValueChange={(v: "all" | "income" | "expense") => setTypeFilter(v)}
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="expense">Despesas</SelectItem>
+              <SelectItem value="income">Receitas</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select
-          value={typeFilter}
-          onValueChange={(value: "all" | "income" | "expense") => setTypeFilter(value)}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="expense">Despesas</SelectItem>
-            <SelectItem value="income">Receitas</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      )}
 
-      {/* Tabela */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">Avatar</TableHead>
-              <TableHead className="w-[100px]">Data</TableHead>
-              <TableHead>Descrição</TableHead>
+              <TableHead
+                className={`w-[100px] ${sortable ? "cursor-pointer select-none" : ""}`}
+                onClick={() => toggleSort("date")}
+              >
+                Data
+                <SortIcon column="date" />
+              </TableHead>
+              <TableHead
+                className={sortable ? "cursor-pointer select-none" : ""}
+                onClick={() => toggleSort("description")}
+              >
+                Descrição
+                <SortIcon column="description" />
+              </TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Conta/Cartão</TableHead>
               <TableHead className="w-[80px]">Parcelas</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
+              <TableHead
+                className={`text-right ${sortable ? "cursor-pointer select-none" : ""}`}
+                onClick={() => toggleSort("amount")}
+              >
+                Valor
+                <SortIcon column="amount" />
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

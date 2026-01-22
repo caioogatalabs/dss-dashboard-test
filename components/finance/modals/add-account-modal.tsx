@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldRow } from "@/components/ui/field"
-import { ButtonGroup } from "@/components/ui/button-group"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
   SelectContent,
@@ -190,7 +190,7 @@ export function AddAccountModal({ open, onOpenChange }: AddAccountModalProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="h-full w-full sm:max-w-[500px]">
+      <DrawerContent className="h-dvh w-full max-sm:max-w-none sm:w-[600px] sm:max-w-[600px]">
         {/* Header */}
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
@@ -210,28 +210,14 @@ export function AddAccountModal({ open, onOpenChange }: AddAccountModalProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          <div className="mx-auto max-w-full space-y-4">
+          <div className="mx-auto max-w-full space-y-[1.2rem]">
             {/* Toggle de Tipo */}
-            <div className="rounded-lg bg-muted p-1">
-              <ButtonGroup className="w-full">
-                <Button
-                  type="button"
-                  variant={type === "bank" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setType("bank")}
-                >
-                  Conta Bancária
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === "credit" ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setType("credit")}
-                >
-                  Cartão de Crédito
-                </Button>
-              </ButtonGroup>
-            </div>
+            <Tabs value={type} onValueChange={(v) => setType(v as AccountType)}>
+              <TabsList>
+                <TabsTrigger value="bank">Conta Bancária</TabsTrigger>
+                <TabsTrigger value="credit">Cartão de Crédito</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
             {/* Nome */}
             <Field
@@ -287,7 +273,7 @@ export function AddAccountModal({ open, onOpenChange }: AddAccountModalProps) {
             {/* Campos condicionais para Cartão de Crédito */}
             {type === "credit" && (
               <>
-                <FieldRow columns={2}>
+                <FieldRow columns={2} className="gap-[1.2rem]">
                   <Field label="Dia de Fechamento" required error={errors.closingDay}>
                     <Input
                       type="number"

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Field, FieldRow } from "@/components/ui/field"
-import { ButtonGroup } from "@/components/ui/button-group"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
   SelectContent,
@@ -284,7 +284,7 @@ export function NewTransactionModal({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="h-full w-full sm:max-w-[500px]">
+      <DrawerContent className="h-dvh w-full max-sm:max-w-none sm:w-[600px] sm:max-w-[600px]">
         {/* Header */}
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">
@@ -306,28 +306,14 @@ export function NewTransactionModal({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4">
-          <div className="mx-auto max-w-full space-y-4">
+          <div className="mx-auto max-w-full space-y-[1.2rem]">
             {/* Toggle de Tipo */}
-            <div className="rounded-lg bg-muted p-1">
-              <ButtonGroup className="w-full">
-                <Button
-                  type="button"
-                  variant={type === "income" ? "default" : "ghost"}
-                  className="flex-1"
-                  onClick={() => setType("income")}
-                >
-                  Receita
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === "expense" ? "default" : "ghost"}
-                  className="flex-1"
-                  onClick={() => setType("expense")}
-                >
-                  Despesa
-                </Button>
-              </ButtonGroup>
-            </div>
+            <Tabs value={type} onValueChange={(v) => setType(v as TransactionType)}>
+              <TabsList>
+                <TabsTrigger value="income">Receita</TabsTrigger>
+                <TabsTrigger value="expense">Despesa</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
             {/* Valor */}
             <Field label="Valor da Transação" required error={errors.amount}>
@@ -409,7 +395,7 @@ export function NewTransactionModal({
             </Field>
 
             {/* Grid: Membro e Conta/Cartão */}
-            <FieldRow columns={2}>
+            <FieldRow columns={2} className="gap-[1.2rem]">
               <Field label="Membro" htmlFor="member">
                 <Select
                   value={memberId || "family"}

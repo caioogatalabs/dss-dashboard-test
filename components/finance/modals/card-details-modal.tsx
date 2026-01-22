@@ -87,7 +87,7 @@ export function CardDetailsModal({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="h-full w-full sm:max-w-[500px]">
+      <DrawerContent className="h-dvh w-full max-sm:max-w-none sm:w-[600px] sm:max-w-[600px]">
         {/* Header */}
         <DrawerHeader className="border-b">
           <div className="flex items-center justify-between">

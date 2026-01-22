@@ -584,8 +584,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       ...member,
       id: `member-${Date.now()}`,
     }
-    // Como familyMembers é const, aqui seria necessário torná-lo state
-    // Para simplificar, não implementamos edição de membros no mock
+    setFamilyMembers((prev) => [...prev, newMember])
   }, [])
 
   const updateFamilyMember = useCallback(
