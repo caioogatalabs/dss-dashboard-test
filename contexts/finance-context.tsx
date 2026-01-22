@@ -51,6 +51,9 @@ interface FinanceContextType {
   updateFamilyMember: (id: string, member: Partial<FamilyMember>) => void
   deleteFamilyMember: (id: string) => void
 
+  // CRUD Categories
+  addCategory: (category: Omit<Category, "id">) => void
+
   // Filtros
   setSelectedMember: (memberId: string | null) => void
   setDateRange: (startDate: Date, endDate: Date) => void
@@ -478,8 +481,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [goals, setGoals] = useState<Goal[]>(initialGoals)
   const [creditCards, setCreditCards] = useState<CreditCard[]>(initialCreditCards)
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(initialBankAccounts)
-  const [familyMembers] = useState<FamilyMember[]>(initialFamilyMembers)
-  const [categories] = useState<Category[]>(initialCategories)
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(initialFamilyMembers)
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
 
   // Estado de filtros
   const [filters, setFilters] = useState<FilterState>({
@@ -593,7 +596,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   )
 
   const deleteFamilyMember = useCallback((id: string) => {
-    // Implementação futura
+    setFamilyMembers((prev) => prev.filter((m) => m.id !== id))
+  }, [])
+
+  // ============ CRUD CATEGORIES ============
+  const addCategory = useCallback((category: Omit<Category, "id">) => {
+    const newCategory: Category = {
+      ...category,
+      id: `cat-${Date.now()}`,
+    }
+    setCategories((prev) => [...prev, newCategory])
   }, [])
 
   // ============ FILTROS ============
@@ -773,6 +785,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       addFamilyMember,
       updateFamilyMember,
       deleteFamilyMember,
+      addCategory,
 
       // Filtros
       setSelectedMember,
@@ -813,6 +826,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       addFamilyMember,
       updateFamilyMember,
       deleteFamilyMember,
+      addCategory,
       setSelectedMember,
       setDateRange,
       setTransactionType,

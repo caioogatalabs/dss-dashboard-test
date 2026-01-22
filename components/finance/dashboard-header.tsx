@@ -12,6 +12,8 @@ import {
 } from "@tabler/icons-react"
 
 import { useFinance } from "@/hooks/use-finance"
+import { NewTransactionModal } from "@/components/finance/modals/new-transaction-modal"
+import { AddMemberModal } from "@/components/finance/modals/add-member-modal"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,6 +44,8 @@ export function DashboardHeader() {
 
   const [searchValue, setSearchValue] = React.useState(filters.searchText)
   const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false)
+  const [showNewTransactionModal, setShowNewTransactionModal] = React.useState(false)
+  const [showAddMemberModal, setShowAddMemberModal] = React.useState(false)
   const [localDateRange, setLocalDateRange] = React.useState<DateRange | undefined>({
     from: filters.dateRange.startDate,
     to: filters.dateRange.endDate,
@@ -263,6 +267,7 @@ export function DashboardHeader() {
             variant="outline"
             size="icon"
             className="size-9 rounded-full"
+            onClick={() => setShowAddMemberModal(true)}
           >
             <IconPlus className="size-4" />
           </Button>
@@ -270,10 +275,16 @@ export function DashboardHeader() {
       </div>
 
       {/* New Transaction Button */}
-      <Button className="gap-2">
+      <Button className="gap-2" onClick={() => setShowNewTransactionModal(true)}>
         <IconPlus className="size-4" />
         <span className="hidden sm:inline">Nova transação</span>
       </Button>
+
+      <NewTransactionModal
+        open={showNewTransactionModal}
+        onOpenChange={setShowNewTransactionModal}
+      />
+      <AddMemberModal open={showAddMemberModal} onOpenChange={setShowAddMemberModal} />
     </header>
   )
 }

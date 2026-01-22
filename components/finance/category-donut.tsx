@@ -9,6 +9,7 @@ interface CategoryDonutProps {
   size?: number
   strokeWidth?: number
   className?: string
+  showDecimal?: boolean
 }
 
 /**
@@ -25,6 +26,7 @@ export function CategoryDonut({
   size = 80,
   strokeWidth = 8,
   className,
+  showDecimal = true,
 }: CategoryDonutProps) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -63,8 +65,13 @@ export function CategoryDonut({
       </svg>
       {/* Percentage text in center */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-sm font-semibold text-foreground">
-          {percentage.toFixed(1)}%
+        <span
+          className={cn(
+            "font-semibold text-foreground",
+            size <= 48 ? "text-xs" : "text-sm"
+          )}
+        >
+          {showDecimal ? percentage.toFixed(1) : Math.round(percentage)}%
         </span>
       </div>
     </div>

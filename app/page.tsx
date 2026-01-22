@@ -4,13 +4,6 @@ import * as React from "react"
 import {
   IconArrowDown,
   IconArrowRight,
-  IconArrowUp,
-  IconCheck,
-  IconChevronLeft,
-  IconChevronRight,
-  IconCreditCard,
-  IconPlus,
-  IconSearch,
 } from "@tabler/icons-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
@@ -20,8 +13,9 @@ import { BalanceCard } from "@/components/finance/balance-card"
 import { IncomeCard } from "@/components/finance/income-card"
 import { ExpenseCard } from "@/components/finance/expense-card"
 import { ExpensesByCategoryCarousel } from "@/components/finance/expenses-by-category-carousel"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { CreditCardsWidget } from "@/components/finance/credit-cards-widget"
+import { UpcomingExpenses } from "@/components/finance/upcoming-expenses"
+import { TransactionsTable } from "@/components/finance/transactions-table"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,28 +25,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
-import financeData from "./finance-data.json"
 
 const chartConfig = {
   income: {
@@ -102,24 +78,9 @@ function generateCashFlowData() {
 
 export default function Home() {
   const [chartFilter, setChartFilter] = React.useState<"all" | "income" | "expenses">("all")
-  const [transactionFilter, setTransactionFilter] = React.useState<"expenses" | "income" | "all">("expenses")
-  const [currentPage, setCurrentPage] = React.useState(1)
-  const itemsPerPage = 5
 
   // Gera dados de fluxo financeiro (mock por enquanto, futuro: do contexto)
   const cashFlowData = React.useMemo(() => generateCashFlowData(), [])
-
-  const filteredTransactions = financeData.transactions.filter((t) => {
-    if (transactionFilter === "all") return true
-    if (transactionFilter === "expenses") return t.type === "expense"
-    return t.type === "income"
-  })
-
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
-  const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
 
   return (
     <SidebarProvider
@@ -157,49 +118,7 @@ export default function Home() {
               </div>
 
               {/* Right Column - Cards/Accounts */}
-              <Card className="py-4">
-                <CardHeader className="flex-row items-center justify-between pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <IconCreditCard className="size-5" />
-                    Cards/Accounts
-                  </CardTitle>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="size-7">
-                      <IconPlus className="size-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="size-7">
-                      <IconArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3 px-4">
-                  {financeData.accounts.map((account) => (
-                    <div
-                      key={account.id}
-                      className="flex items-center justify-between rounded-lg border p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="flex size-8 items-center justify-center rounded text-xs font-bold text-white"
-                          style={{ backgroundColor: account.color }}
-                        >
-                          {account.bank.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">{account.bank}</div>
-                          <div className="text-lg font-bold">{formatCurrency(account.balance)}</div>
-                          <div className="text-xs text-muted-foreground">
-                            Vence dia {account.dueDay}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        **** {account.lastDigits}
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              <CreditCardsWidget />
             </div>
 
             {/* Middle Section: Chart + Upcoming Expenses */}
@@ -305,47 +224,7 @@ export default function Home() {
               </Card>
 
               {/* Upcoming Expenses */}
-              <Card className="py-4">
-                <CardHeader className="flex-row items-center justify-between pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <IconCreditCard className="size-5" />
-                    Próximas despesas
-                  </CardTitle>
-                  <Button variant="ghost" size="icon" className="size-7">
-                    <IconPlus className="size-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-0 px-4">
-                  {financeData.upcomingExpenses.map((expense, index) => (
-                    <div
-                      key={expense.id}
-                      className={`flex items-center justify-between py-4 ${
-                        index !== financeData.upcomingExpenses.length - 1 ? "border-b" : ""
-                      }`}
-                    >
-                      <div>
-                        <div className="font-medium">{expense.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Vence dia {expense.dueDay}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {expense.account}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">
-                          {formatCurrency(expense.value)}
-                        </span>
-                        {expense.paid && (
-                          <div className="flex size-5 items-center justify-center rounded-full bg-green-100 text-green-600">
-                            <IconCheck className="size-3" />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              <UpcomingExpenses />
             </div>
 
             {/* Bottom Section: Transactions Table */}
@@ -365,135 +244,9 @@ export default function Home() {
                   </svg>
                   Extrato detalhado
                 </CardTitle>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar lançamentos"
-                      className="w-48 pl-9"
-                    />
-                  </div>
-                  <Select
-                    value={transactionFilter}
-                    onValueChange={(value: "expenses" | "income" | "all") =>
-                      setTransactionFilter(value)
-                    }
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos</SelectItem>
-                      <SelectItem value="expenses">Despesas</SelectItem>
-                      <SelectItem value="income">Receitas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </CardHeader>
               <CardContent className="px-4">
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="w-16">Membro</TableHead>
-                        <TableHead className="hidden sm:table-cell">Datas</TableHead>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead className="hidden md:table-cell">Categorias</TableHead>
-                        <TableHead className="hidden lg:table-cell">Conta/cartão</TableHead>
-                        <TableHead className="hidden lg:table-cell">Parcelas</TableHead>
-                        <TableHead className="text-right">Valor</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedTransactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell>
-                            <Avatar className="size-8">
-                              <AvatarImage src={transaction.member} />
-                              <AvatarFallback>
-                                {transaction.description.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          </TableCell>
-                          <TableCell className="hidden text-muted-foreground sm:table-cell">
-                            {transaction.date}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <IconArrowUp
-                                className={`size-4 ${
-                                  transaction.type === "income"
-                                    ? "rotate-180 text-green-500"
-                                    : "text-red-500"
-                                }`}
-                              />
-                              {transaction.description}
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <Badge variant="secondary">{transaction.category}</Badge>
-                          </TableCell>
-                          <TableCell className="hidden text-muted-foreground lg:table-cell">
-                            {transaction.account}
-                          </TableCell>
-                          <TableCell className="hidden text-muted-foreground lg:table-cell">
-                            {transaction.installments}
-                          </TableCell>
-                          <TableCell
-                            className={`text-right font-medium ${
-                              transaction.type === "income"
-                                ? "text-green-600"
-                                : ""
-                            }`}
-                          >
-                            {transaction.type === "income" ? "+" : ""}
-                            {formatCurrency(transaction.value)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Pagination */}
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
-                    Mostrando {(currentPage - 1) * itemsPerPage + 1} a{" "}
-                    {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} de{" "}
-                    {filteredTransactions.length}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <IconChevronLeft className="size-4" />
-                    </Button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="icon"
-                        className="size-8"
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Button>
-                    ))}
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-8"
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      <IconChevronRight className="size-4" />
-                    </Button>
-                  </div>
-                </div>
+                <TransactionsTable />
               </CardContent>
             </Card>
           </div>
